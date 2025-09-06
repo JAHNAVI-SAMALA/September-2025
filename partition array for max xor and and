@@ -1,0 +1,51 @@
+from typing import List
+
+class Solution:
+    def maximizeXorAndXor(self, nums: List[int]) -> int:
+        n = len(nums)
+        totalXor = 0
+        for val in nums:
+            totalXor ^= val
+
+        def get_linear_basis(arr: List[int]) -> List[int]:
+            basis = []
+            for num in arr:
+                for b in basis:
+                    num = min(num, num ^ b)
+                if num:
+                    basis.append(num)
+            return basis
+
+        def get_max_xor(basis: List[int]) -> int:
+            max_xor = 0
+            for b in basis:
+                max_xor = max(max_xor, max_xor ^ b)
+            return max_xor
+
+        maxVal = 0
+        for mask in range(1, 1 << n):  # skip empty set
+            selected_AND = -1
+            selected_XOR = 0
+            unselected = []
+
+            for i in range(n):
+                if (mask >> i) & 1:
+                    selected_XOR ^= nums[i]
+                    if selected_AND == -1:
+                        selected_AND = nums[i]
+                    else:
+                        selected_AND &= nums[i]
+                else:
+                    unselected.append(nums[i])
+
+            unselected_XOR = totalXor ^ selected_XOR
+            inverted_mask = ~unselected_XOR
+
+            reduced = [(x & inverted_mask) for x in unselected]
+            basis = get_linear_basis(reduced)
+            max_xor = get_max_xor(basis)
+
+            current_val = selected_AND + unselected_XOR + 2 * max_xor
+            maxVal = max(maxVal, current_val)
+
+        return maxVal

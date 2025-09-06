@@ -1,0 +1,26 @@
+from functools import lru_cache
+class Solution:
+    def minOperations(self, queries: List[List[int]]) -> int:
+        powers = []
+        p = 1
+        while p <= 10 ** 18:
+            powers.append(p)
+            p *= 4
+        @lru_cache(None)
+        def getOperations(n):
+            if n <= 0:
+                return 0
+            ops = 0
+            res = 0
+            for power in powers:
+                if power > n:
+                    break
+                l = power
+                r = min(n,power*4-1)
+                ops += 1
+                res += (r - l + 1) * ops
+            return res
+        ans = 0
+        for l,r in queries:
+            ans += (getOperations(r) - getOperations(l - 1)+1) // 2
+        return ans

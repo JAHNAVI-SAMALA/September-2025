@@ -1,0 +1,27 @@
+class Solution:
+    def spellchecker(self, wordlist: List[str], queries: List[str]) -> List[str]:
+        exact_words = set(wordlist)
+        lower_map = {}
+        vowel_map = {}
+        for word in wordlist:
+            w_lower = word.lower()
+            if w_lower not in lower_map:
+                lower_map[w_lower] = word
+            w_key = ''.join('*' if c in 'aeiou' else c for c in w_lower)
+            if w_key not in vowel_map:
+                vowel_map[w_key] = word
+        ans = []
+        for query in queries:
+            if query in exact_words:
+                ans.append(query)
+            else:
+                q_lower = query.lower()
+                q_key = ''.join('*' if c in 'aeiou' else c for c in q_lower)
+                if q_lower in lower_map:
+                    ans.append(lower_map[q_lower])
+                elif q_key in vowel_map:
+                    ans.append(vowel_map[q_key])
+                else:
+                    ans.append("")
+        return ans
+            
